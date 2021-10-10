@@ -14,3 +14,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [\App\Http\Controllers\Page\PageController::class, 'index']);
+Route::get('/parking', [\App\Http\Controllers\Page\PageController::class, 'parkingSystem']);
