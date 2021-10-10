@@ -586,7 +586,7 @@
                                 </tr>
                                 </thead>
                                 <tbody id="tableBody">
-                                @foreach(\App\Models\User::all() as $item)
+                                @foreach(\App\Models\User::all()->take(100) as $item)
                                     <tr id="row_{{$item->id}}">
                                         <th scope="row">#</th>
                                         <td id="name_{{$item->id}}">{{$item->name}}</td>
