@@ -441,14 +441,14 @@
 
                     <div class="ml-3">
                         <div class="mt-2 text-gray-600 dark:text-gray-400 text-sm">
-                            <form class="form-inline">
+                            <class class="form-inline">
                                 <div class="form-group mx-sm-3 mb-2">
                                     <label for="inputPassword2" class="sr-only">Command</label>
-                                    <input type="text" class="form-control" id="command_input" placeholder="Password">
+                                    <input type="text" class="form-control" id="command_input" placeholder="Command">
                                 </div>
                                 <button type="button" class="btn btn-primary mb-2" onclick="defineCommand()">Submit
                                 </button>
-                            </form>
+                            </class>
                         </div>
                     </div>
                 </div>
@@ -471,7 +471,9 @@
 
                     <div class="ml-1">
                         <div class="mt-2 text-gray-600 dark:text-gray-400 text-sm">
-                            <div id="output_div"></div>
+                            <div id="output_div">
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -514,14 +516,26 @@
                 break;
             case 'leave':
                 // code block
+                var commandParam = splitCommand[1];
+                leavingPakingLot(commandParam);
                 break;
             case 'status':
                 // code block
+                showStatus();
                 break;
             case 'registration_numbers_for_cars_with_colour':
+                var commandParam = splitCommand[1];
+                // code block
+                parkingWRegistrationByColors(commandParam);
+                break;
+            case 'slot_numbers_for_cars_with_colour':
+                var commandParam = splitCommand[1];
+                slotNumbersForCarsWithColour(commandParam);
                 // code block
                 break;
             case 'slot_number_for_registration_number':
+                var commandParam = splitCommand[1];
+                slotNumberForRegistrationNumber(commandParam);
                 // code block
                 break;
             default:
@@ -539,26 +553,130 @@
     }
 
     function allocateParkingSlot(plat, color) {
-        var isAllocate = false;
+        var isDone = false;
         if (parking_slot.length > 0) {
             var newItem = [plat, color];
-            do {
-                parking_slot.forEach((item) => {
-                    console.log("Processing");
-                    if (item == []) {
-                        item = newItem;
-                        isAllocate = true;
-                        console.log('filledd');
+            console.log(newItem);
+
+            parking_slot.forEach((item, index) => {
+                if (!isDone) {
+                    if (item.length == 0) {
+                        parking_slot[index] = newItem;
+                        isDone = true;
+                        // console.log('fill');
+                        $("#output_div").append("<li class='alert alert-success'>Allocated slot number:  " + (index + 1) + "</li>")
                     }
-                })
-            }
-            while (!isAllocate);
+                }
+            })
+        } else {
+            $("#output_div").append("<li class='alert alert-danger'> Sorry, Parking Not Available yet</li>");
+        }
+
+        if (!isDone) {
+            $("#output_div").append("<li class='alert alert-danger'> Sorry, Parking lot is full</li>");
+        }
+    }
+
+    function leavingPakingLot(param) {
+
+        if (parking_slot[param - 1].length == 0) {
+
+        } else {
+            parking_slot[param - 1] = [];
+            $("#output_div").append("<li class='alert alert-success'> Slot number:  " + param + " is free</li>")
         }
 
         console.log(parking_slot);
     }
 
+    function showStatus() {
+        $("#output_div").empty();
+        $("#output_div").append(" <div class='alert alert-success'>\n" +
+            "                                    <table class=\"table table-bordered\">\n" +
+            "                                        <thead>\n" +
+            "                                        <tr>\n" +
+            "                                            <th scope=\"col\">Slot No.</th>\n" +
+            "                                            <th scope=\"col\">Registration No.</th>\n" +
+            "                                            <th scope=\"col\">Color</th>\n" +
+            "                                        </tr>\n" +
+            "                                        </thead>\n" +
+            "                                        <tbody id=\"statusTable\">\n" +
+            "                                        </tbody>\n" +
+            "                                    </table>\n" +
+            "                                </div>");
 
+        $.each(parking_slot, function (key, item) {
+            if (item.length > 0) {
+                $("#statusTable").append(" <tr>\n" +
+                    "                                            <th scope=\"row\">" + (key + 1) + "</th>\n" +
+                    "                                            <td>" + item[0] + "</td>\n" +
+                    "                                            <td>" + item[1] + "</td>\n" +
+                    "                                        </tr>");
+            } else {
+                $("#statusTable").append(" <tr>\n" +
+                    "                                            <th scope=\"row\">" + (key + 1) + "</th>\n" +
+                    "                                            <td>Empty</td>\n" +
+                    "                                            <td>Empty</td>\n" +
+                    "                                        </tr>");
+            }
+
+        });
+    }
+
+    /**
+     * Return Registration Number as Array
+     *
+     * @param param
+     */
+    function parkingWRegistrationByColors(param) {
+        var result = [];
+
+        parking_slot.forEach((item, index) => {
+            if (item.includes(param)) {
+                result.push(item[0])
+            }
+        });
+
+        if (result.length < 1) {
+            $("#output_div").append("<li class='alert alert-danger'> Not found</li>");
+        } else {
+            $("#output_div").append("<li class='alert alert-success'>" + result + "</li>")
+        }
+
+    }
+
+    function slotNumbersForCarsWithColour(param) {
+        var result = [];
+
+        parking_slot.forEach((item, index) => {
+            if (item.includes(param)) {
+                result.push(index + 1)
+            }
+        });
+
+        if (result.length < 1) {
+            $("#output_div").append("<li class='alert alert-danger'> Not found</li>");
+        } else {
+            $("#output_div").append("<li class='alert alert-success'>" + result + "</li>")
+        }
+
+    }
+
+    function slotNumberForRegistrationNumber(param) {
+        var result = [];
+
+        parking_slot.forEach((item, index) => {
+            if (item.includes(param)) {
+                result.push(index + 1)
+            }
+        });
+
+        if (result.length < 1) {
+            $("#output_div").append("<li class='alert alert-danger'> Not found</li>");
+        } else {
+            $("#output_div").append("<li class='alert alert-success'>" + result + "</li>")
+        }
+    }
 </script>
 
 </body>
